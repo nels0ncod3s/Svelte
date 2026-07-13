@@ -34,6 +34,11 @@
 
 	<div class="relative w-full max-w-md flex flex-col items-center">
 
+		<!-- Icon badge -->
+		<div class="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-200 mb-5">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+		</div>
+
 		<!-- Eyebrow -->
 		<div class="flex items-center gap-2 mb-6">
 			<span class="h-1.5 w-1.5 rounded-full bg-lime-400"></span>
@@ -49,23 +54,31 @@
 		</p>
 
 		<form onsubmit={signIn} class="w-full grid gap-3">
-			<Input
-				id="email"
-				type="email"
-				placeholder="Email"
-				bind:value={email}
-				class="h-14 rounded-full bg-zinc-900/70 border border-zinc-800 px-6 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-zinc-600 focus-visible:ring-offset-0"
-				disabled={loading}
-				required
-			/>
+			<div class="relative">
+				<span class="absolute inset-y-0 left-5 flex items-center text-zinc-500 pointer-events-none">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+				</span>
+				<Input
+					id="email"
+					type="email"
+					placeholder="Email"
+					bind:value={email}
+					class="h-14 rounded-xl bg-zinc-900/70 border border-zinc-800 pl-12 pr-6 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-zinc-600 focus-visible:ring-offset-0 w-full"
+					disabled={loading}
+					required
+				/>
+			</div>
 
 			<div class="relative">
+				<span class="absolute inset-y-0 left-5 flex items-center text-zinc-500 pointer-events-none">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+				</span>
 				<Input
 					id="password"
 					type={showPassword ? "text" : "password"}
 					placeholder="Password"
 					bind:value={password}
-					class="h-14 rounded-full bg-zinc-900/70 border border-zinc-800 px-6 pr-14 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-zinc-600 focus-visible:ring-offset-0 w-full"
+					class="h-14 rounded-xl bg-zinc-900/70 border border-zinc-800 pl-12 pr-14 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-zinc-600 focus-visible:ring-offset-0 w-full"
 					disabled={loading}
 					required
 				/>
@@ -84,7 +97,7 @@
 			</div>
 
 			{#if error}
-				<div class="text-red-400 text-xs font-medium bg-red-950/30 px-5 py-3 rounded-full border border-red-900/50 flex items-center justify-center gap-2">
+				<div class="text-red-400 text-xs font-medium bg-red-950/30 px-5 py-3 rounded-xl border border-red-900/50 flex items-center justify-center gap-2">
 					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
 					{error}
 				</div>
@@ -92,7 +105,7 @@
 
 			<Button
 				type="submit"
-				class="w-full h-14 mt-2 rounded-full font-bold uppercase tracking-widest text-sm bg-zinc-100 text-zinc-950 hover:bg-white transition-all"
+				class="w-full h-14 mt-2 rounded-xl font-bold uppercase tracking-widest text-sm bg-zinc-100 text-zinc-950 hover:bg-white transition-all"
 				disabled={loading}
 			>
 				{#if loading}
