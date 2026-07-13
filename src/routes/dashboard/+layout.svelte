@@ -11,16 +11,23 @@
     let loading = true;
 
     onMount(async () => {
-        const {
-            data: { session }
-        } = await getSession();
+        try {
+            const {
+                data: { session }
+            } = await getSession();
 
-        if (!session) {
-            goto("/login");
-            return;
+            console.log("session:", session);
+
+            if (!session) {
+                console.log("no session, redirecting to /login");
+                goto("/login");
+                return;
+            }
+
+            loading = false;
+        } catch (err) {
+            console.error("getSession failed:", err);
         }
-
-        loading = false;
     });
 </script>
 
