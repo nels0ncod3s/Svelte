@@ -1,9 +1,4 @@
 <script>
-
-  import Button from "$lib/components/ui/button/button.svelte";
-  import { Badge } from "$lib/components/ui/badge/index.js";
-
-
   const features = [
     {
       title: "Passwordless Login",
@@ -21,7 +16,7 @@
 </script>
 
 <svelte:head>
-  <title>First Layer - Auth0 alternative</title>
+  <title>SimpleAuth</title>
   <meta
     name="description"
     content="Authentication infrastructure without the complexity."
@@ -30,23 +25,18 @@
 
 <section class="hero">
   <nav>
-    <div class="logo">First Layer</div>
+    <div class="logo">SimpleAuth</div>
 
     <div class="links">
       <a href="#features">Features</a>
       <a href="#docs">Docs</a>
       <a href="#pricing">Pricing</a>
-      <a href="#changelog">Changelog</a>
-      <Button class="login">Login</Button>
       <a href="/login" class="login">Login</a>
     </div>
   </nav>
 
   <div class="content">
     <div class="left">
-
-      <Badge>Authentication made easy</Badge>
-
       <span class="badge">
         Authentication made simple
       </span>
@@ -62,9 +52,6 @@
       </p>
 
       <div class="buttons">
-      <button class="primary">Get Started</button>
-      <button class="secondary">Read Docs</button>
-
         <a href="/signup" class="primary">
           Get Started
         </a>
@@ -101,13 +88,11 @@
         </div>
 
         <div class="code">
-
 <pre>{`import { auth } from "simpleauth";
 
 await auth.login({
   provider: "google"
-});`}
-</pre>
+});`}</pre>
 
           <button>Continue with Google</button>
         </div>
