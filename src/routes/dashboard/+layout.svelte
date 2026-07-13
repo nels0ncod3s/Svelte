@@ -1,11 +1,26 @@
 <script>
-	import favicon from '$lib/assets/favicon.svg';
+    import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+    import { getSession } from "$lib/services/auth";
 
-	let { children } = $props();
+    let loading = true;
+
+    onMount(async () => {
+        const {
+            data: { session }
+        } = await getSession();
+
+        if (!session) {
+            goto("/login");
+            return;
+        }
+
+        loading = false;
+    });
 </script>
 
-<svelte:head>
-	<link rel="icon" href={favicon} />
-</svelte:head>
-
-{@render children()}
+{#if loading}
+    <h2>Loading...</h2>
+{:else}
+    <slot />
+{/if}

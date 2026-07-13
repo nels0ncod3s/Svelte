@@ -37,8 +37,7 @@
       <a href="#docs">Docs</a>
       <a href="#pricing">Pricing</a>
       <a href="#changelog">Changelog</a>
-      <Button class="login">Login</Button>
-      <a href="/login" class="login">Login</a>
+      <Button class="login"><a href="/login" class="login">Login</a></Button>
     </div>
   </nav>
 
@@ -62,12 +61,12 @@
       </p>
 
       <div class="buttons">
-      <button class="primary">Get Started</button>
+      <button class="primary"><a href="/signup" class="primary">
+          Get Started
+        </a></button>
       <button class="secondary">Read Docs</button>
 
-        <a href="/signup" class="primary">
-          Get Started
-        </a>
+        
 
         <a href="/docs" class="secondary">
           Read Docs
