@@ -1,12 +1,21 @@
 <script>
     import { logout } from "$lib/services/auth";
     import { goto } from "$app/navigation";
-    import CalendarIcon from "@lucide/svelte/icons/calendar";
+
     import HouseIcon from "@lucide/svelte/icons/house";
-    import InboxIcon from "@lucide/svelte/icons/inbox";
+
     import SearchIcon from "@lucide/svelte/icons/search";
     import SettingsIcon from "@lucide/svelte/icons/settings";
     import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+
+    import Users from "@lucide/svelte/icons/users"
+    import KeyRound from "@lucide/svelte/icons/key-round"
+    import AppWindow from "@lucide/svelte/icons/app-window"
+    import ShieldCheck from "@lucide/svelte/icons/shield-check"
+    import ScrollText from "@lucide/svelte/icons/scroll-text"
+    import Webhook from "@lucide/svelte/icons/webhook"
+    import CreditCard from "@lucide/svelte/icons/credit-card"
+
 
     async function signOut() {
         await logout();
@@ -21,25 +30,51 @@
             icon: HouseIcon,
         },
         {
-            title: "Inbox",
+            title: "App",
             url: "#",
-            icon: InboxIcon,
+            icon: AppWindow,
         },
         {
-            title: "Calendar",
+            title: "Users",
             url: "#",
-            icon: CalendarIcon,
+            icon: Users,
         },
         {
-            title: "Search",
+            title: "Authentication",
             url: "#",
-            icon: SearchIcon,
+            icon: ShieldCheck,
+        },
+        {
+            title: "API Keys",
+            url: "#",
+            icon: KeyRound,
+        },
+        {
+            title: "Users",
+            url: "#",
+            icon: Users,
+        },
+        {
+            title: "Logs",
+            url: "#",
+            icon: ScrollText,
+        },
+        {
+            title: "Webhook",
+            url: "#",
+            icon: Webhook,
+        },
+        {
+            title: "Billings",
+            url: "#",
+            icon: CreditCard,
         },
         {
             title: "Settings",
             url: "#",
             icon: SettingsIcon,
         },
+       
     ];
 </script>
 

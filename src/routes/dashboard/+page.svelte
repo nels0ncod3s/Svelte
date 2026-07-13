@@ -2,7 +2,7 @@
   // Dashboard page logic goes here
 </script>
 
-<h1 class="text-2xl font-semibold">Dashboard</h1>
+<h1 class="text-2xl font-semibold">Welcome Back, NAME</h1>
 
 <!-- Your actual dashboard content goes here.
      The sidebar, Sidebar.Provider, and Sidebar.Trigger
