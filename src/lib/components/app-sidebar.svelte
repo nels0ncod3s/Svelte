@@ -50,11 +50,6 @@
             icon: KeyRound,
         },
         {
-            title: "Users",
-            url: "#",
-            icon: Users,
-        },
-        {
             title: "Logs",
             url: "#",
             icon: ScrollText,

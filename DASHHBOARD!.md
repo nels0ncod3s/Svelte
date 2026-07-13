@@ -1,0 +1,1 @@
+- Can we make the dashboard mobile frienedly, so i can see the option to logout if need be 
