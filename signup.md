@@ -5,16 +5,15 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 
-	let email = $state("");
-	let password = $state("");
-	let confirmPassword = $state("");
-	let error = $state("");
-	let loading = $state(false);
-	let showPassword = $state(false);
-	let showConfirmPassword = $state(false);
+	let email = "";
+	let password = "";
+	let confirmPassword = "";
+	let error = "";
+	let loading = false;
+	let showPassword = false;
+	let showConfirmPassword = false;
 
-	async function createAccount(e) {
-		e.preventDefault();
+	async function createAccount() {
 		error = "";
 
 		if (password !== confirmPassword) {
@@ -53,7 +52,7 @@
 		</Card.Header>
 		
 		<Card.Content class="pt-4">
-			<form onsubmit={createAccount} class="grid gap-4">
+			<form on:submit|preventDefault={createAccount} class="grid gap-4">
 				<div class="grid gap-2">
 					<label for="email" class="text-xs font-semibold uppercase tracking-wider text-zinc-400">
 						Email Address
@@ -94,7 +93,7 @@
 						<button 
 							type="button" 
 							class="absolute inset-y-0 right-3 flex items-center text-zinc-500 hover:text-zinc-300 transition-colors"
-							onclick={() => showPassword = !showPassword}
+							on:click={() => showPassword = !showPassword}
 						>
 							{#if showPassword}
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
@@ -125,7 +124,7 @@
 						<button 
 							type="button" 
 							class="absolute inset-y-0 right-3 flex items-center text-zinc-500 hover:text-zinc-300 transition-colors"
-							onclick={() => showConfirmPassword = !showConfirmPassword}
+							on:click={() => showConfirmPassword = !showConfirmPassword}
 						>
 							{#if showConfirmPassword}
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>

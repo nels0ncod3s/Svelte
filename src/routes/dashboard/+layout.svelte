@@ -8,7 +8,7 @@
 
     let { children } = $props();
 
-    let loading = true;
+    let loading = $state(true);
 
     onMount(async () => {
         try {
