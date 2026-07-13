@@ -37,7 +37,7 @@
       <a href="#docs">Docs</a>
       <a href="#pricing">Pricing</a>
       <a href="#changelog">Changelog</a>
-      <Button class="login"><a href="/login" class="login">Login</a></Button>
+      <Button><a href="/login" class="login">Login</a></Button>
     </div>
   </nav>
 
@@ -64,13 +64,9 @@
       <button class="primary"><a href="/signup" class="primary">
           Get Started
         </a></button>
-      <button class="secondary">Read Docs</button>
-
-        
-
-        <a href="/docs" class="secondary">
+      <button class="secondary"><a href="/docs" class="secondary">
           Read Docs
-        </a>
+        </a></button>
       </div>
 
       <div class="stats">
@@ -107,8 +103,6 @@ await auth.login({
   provider: "google"
 });`}
 </pre>
-
-          <button>Continue with Google</button>
         </div>
       </div>
     </div>
