@@ -2,20 +2,43 @@
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { getSession } from "$lib/services/auth";
-    import { dashboard } from "$lib/stores/dashboard.svelte.js";
 
     import * as Sidebar from "$lib/components/ui/sidebar/index.js";
     import AppSidebar from "$lib/components/app-sidebar.svelte";
-    import ChevronRight from "@lucide/svelte/icons/chevron-right";
 
     let { children } = $props();
 
     let loading = $state(true);
     let userData = $state({ name: "User", email: "" });
 
+    // --- Project switcher state ---
+    let projects = $state([]); // populate from your data layer
+    let currentProject = $state(null); // e.g. { id, name }
+    let dropdownOpen = $state(false);
+
+    function toggleDropdown() {
+        dropdownOpen = !dropdownOpen;
+    }
+
+    function closeDropdown() {
+        dropdownOpen = false;
+    }
+
+    function switchProject(project) {
+        currentProject = project;
+        closeDropdown();
+        // TODO: trigger any route/context change needed when switching projects
+    }
+
+    function addNewProject() {
+        closeDropdown();
+        // TODO: open your Add Project modal here
+    }
+
+    // Close dropdown when clicking outside
     function handleWindowClick(e) {
         if (!e.target.closest("[data-project-switcher]")) {
-            dashboard.closeSwitcher();
+            closeDropdown();
         }
     }
 
@@ -35,8 +58,9 @@
                 email: session.user?.email || ""
             };
 
-            // TODO: fetch real projects list for this user and set `dashboard.projects`.
-            // e.g. dashboard.projects = await getProjects(session.user.id);
+            // TODO: fetch real projects list for this user and set `projects` + `currentProject`
+            // e.g. projects = await getProjects(session.user.id);
+            //      currentProject = projects[0] ?? null;
 
             loading = false;
         } catch (err) {
@@ -58,25 +82,25 @@
 
         <main class="flex-1 min-w-0 bg-[#0a0a0b] min-h-screen text-zinc-100">
 
-            <!-- Sticky header — single consolidated breadcrumb bar. This is now the
-                 only place a breadcrumb renders; the dashboard page no longer draws
-                 its own. -->
+            <!-- Sticky header with breadcrumb / project switcher -->
             <header class="sticky top-0 z-10 flex items-center gap-3 border-b border-zinc-800 bg-[#0a0a0b]/80 backdrop-blur-md px-4 py-3 sm:px-6">
                 <Sidebar.Trigger class="h-9 w-9 rounded-md hover:bg-zinc-800 transition-colors" />
 
-                <nav class="flex items-center flex-wrap gap-1.5 text-sm min-w-0" aria-label="Breadcrumb">
+                <!-- Breadcrumb -->
+                <nav class="flex items-center gap-1.5 text-sm min-w-0" aria-label="Breadcrumb">
 
-                    <!-- "Projects" — dropdown trigger + breadcrumb root -->
+                    <!-- "Projects" — dropdown trigger -->
                     <div class="relative" data-project-switcher>
                         <button
-                            onclick={() => dashboard.toggleSwitcher()}
+                            onclick={toggleDropdown}
                             aria-haspopup="listbox"
-                            aria-expanded={dashboard.switcherOpen}
+                            aria-expanded={dropdownOpen}
                             class="flex items-center gap-1 rounded px-1.5 py-0.5 text-zinc-300 hover:text-zinc-100 hover:bg-zinc-800 transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
                         >
                             Projects
+                            <!-- Chevron icon -->
                             <svg
-                                class="w-3.5 h-3.5 text-zinc-500 transition-transform {dashboard.switcherOpen ? 'rotate-180' : ''}"
+                                class="w-3.5 h-3.5 text-zinc-500 transition-transform {dropdownOpen ? 'rotate-180' : ''}"
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
@@ -86,24 +110,26 @@
                             </svg>
                         </button>
 
-                        {#if dashboard.switcherOpen}
+                        <!-- Dropdown menu -->
+                        {#if dropdownOpen}
                             <div
                                 role="listbox"
                                 aria-label="Switch project"
                                 class="absolute left-0 top-full mt-1.5 w-52 rounded-lg border border-zinc-700/60 bg-zinc-900 shadow-xl shadow-black/40 overflow-hidden z-50"
                             >
-                                {#if dashboard.projects.length > 0}
+                                {#if projects.length > 0}
                                     <ul class="py-1 max-h-60 overflow-y-auto">
-                                        {#each dashboard.projects as project (project.id)}
+                                        {#each projects as project (project.id)}
                                             <li>
                                                 <button
                                                     role="option"
-                                                    aria-selected={dashboard.activeProjectId === project.id}
-                                                    onclick={() => dashboard.switchProject(project)}
-                                                    class="w-full flex items-center justify-between px-3 py-2 text-sm text-left text-zinc-200 hover:bg-zinc-800 transition-colors {dashboard.activeProjectId === project.id ? 'text-white font-medium' : ''}"
+                                                    aria-selected={currentProject?.id === project.id}
+                                                    onclick={() => switchProject(project)}
+                                                    class="w-full flex items-center justify-between px-3 py-2 text-sm text-left text-zinc-200 hover:bg-zinc-800 transition-colors {currentProject?.id === project.id ? 'text-white font-medium' : ''}"
                                                 >
                                                     {project.name}
-                                                    {#if dashboard.activeProjectId === project.id}
+                                                    {#if currentProject?.id === project.id}
+                                                        <!-- Checkmark for active project -->
                                                         <svg class="w-3.5 h-3.5 text-zinc-400 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                             <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
                                                         </svg>
@@ -118,11 +144,9 @@
                                     <div class="border-t border-zinc-700/60"></div>
                                 {/if}
 
-                                <!-- Add New Project — opens the real Add Project modal
-                                     (rendered on the dashboard page) via shared state,
-                                     instead of routing anywhere. -->
+                                <!-- Add New Project -->
                                 <button
-                                    onclick={() => dashboard.openAddDialog()}
+                                    onclick={addNewProject}
                                     class="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-left text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
                                 >
                                     <svg class="w-4 h-4 text-zinc-500 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -134,22 +158,11 @@
                         {/if}
                     </div>
 
-                    <!-- Rest of the breadcrumb: active project name, then Settings
-                         if the user is nested inside it. Each non-final crumb is
-                         clickable. -->
-                    {#each dashboard.crumbs as crumb, i}
-                        <ChevronRight class="h-3.5 w-3.5 text-zinc-700 shrink-0" aria-hidden="true" />
-                        {#if i === dashboard.crumbs.length - 1}
-                            <span class="text-zinc-100 font-medium truncate">{crumb}</span>
-                        {:else}
-                            <button
-                                class="text-zinc-500 hover:text-zinc-300 transition-colors truncate"
-                                onclick={() => (dashboard.settingsOpen = false)}
-                            >
-                                {crumb}
-                            </button>
-                        {/if}
-                    {/each}
+                    <!-- Separator + current project name (only when a project is active) -->
+                    {#if currentProject}
+                        <span class="text-zinc-600 select-none" aria-hidden="true">/</span>
+                        <span class="text-zinc-100 font-medium truncate">{currentProject.name}</span>
+                    {/if}
                 </nav>
             </header>
 
