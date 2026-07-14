@@ -1,7 +1,5 @@
-- too many things on the sidebar lets reduce it to just (Dasshboard, App, Authentication and Users)
-- make the logout red so its clear
-- can the icons and text be bigger?
-- Highlights on which page we're on should be visible
-- Users login with google or email, lets use that real email in the bottom 
-- the dashboard is dark why is the side bar white - lets fix that 
-- clicking other pages like Users does nothing, do we need to fix that here or on the dashboard code?
+- The bottom part of the sidebar where ill see the logot no longer works, lets fix that 
+
+MOBILE:
+- Once i click a link to another page, the sidebar should automatically close 
+ 

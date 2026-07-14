@@ -6,9 +6,6 @@ Please implement the following updates, fixes, and feature additions to the dash
 
 ## 1. Navigation & Routing
 
-### 🔄 Sidebar Navigation
-* **Requirement:** Clicking items in the sidebar (e.g., "User Settings") must dynamically render/route to their respective pages within the dashboard layout instead of remaining on the same view.
-
 ### 📍 Dynamic Breadcrumbs
 * **Requirement:** Add a dynamic breadcrumb navigation bar in the top header, positioned right next to the collapsible sidebar icon.
 * **Behavior:** Breadcrumbs should only appear when necessary (e.g., when the user is deep in nested pages like `Dashboard > Projects > [Project Name] > Settings`). If the user is on the root Dashboard home, the breadcrumb should be hidden or simplified.
@@ -27,18 +24,9 @@ Please implement the following updates, fixes, and feature additions to the dash
 ### 🌗 "Add Project" Dark Mode
 * **Requirement:** Update the "Add Project" view (modal or page) to support and properly display in dark mode, matching the rest of the dark theme design system.
 
-### 🔘 Button Copy & Styling Updates
-* **Change Text:** Ensure both "create project" buttons are labeled exactly **"Create Project"** (proper casing).
-* **Outer Button Style:** The main/trigger button (e.g., on the dashboard overview) should use the primary **brand color**.
-* **Inner Button Style:** The action button inside the creation form/modal should have a **slightly disabled grey color** (until the form is valid/ready).
-
 ---
 
 ## 3. Project Dashboard & Management Flow
-
-### 👋 Dynamic User Greeting
-* **Requirement:** Update the dashboard header to dynamically welcome the authenticated user using their name.
-* **Format:** `"Welcome back, [NAME]"` (replace `[NAME]` with the active user's actual display name).
 
 ### 🗂️ "My Projects" Dashboard Grid
 * **Requirement:** Once a user navigates away from an active project page back to the main area, display a dashboard featuring all of their projects in a clean **card format**.
@@ -54,3 +42,6 @@ Please implement the following updates, fixes, and feature additions to the dash
 
 ## 4. General Polish
 * Walk through the main user flows to identify and fix any residual UI layout shifts, broken alignment, or styling inconsistencies.
+
+## 5. MOBILE
+- The top where 'dashboard' is written should be where the breadcrumming should take place
