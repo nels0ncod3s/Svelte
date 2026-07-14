@@ -8,14 +8,14 @@ A lightweight, drop-in authentication service for your applications. Supports em
 
 | Feature | Status |
 |---------|--------|
-| Email & password authentication | 🚧  |
-| Social login (Google, GitHub) | 🚧  |
-| Magic link / passwordless | 🚧  |
-| JWT session management | 🚧 |
-| Refresh token rotation | 🚧  |
-| Role-based access control (RBAC) | 🚧  |
-| Email verification | 🚧  |
-| Password reset flow | 🚧  |
+| Email & password authentication | ✅ |
+| Social login (Google, GitHub) | ✅ |
+| Magic link / passwordless | ✅ |
+| JWT session management | ✅ |
+| Refresh token rotation | ✅ |
+| Role-based access control (RBAC) | ✅ |
+| Email verification | ✅ |
+| Password reset flow | ✅ |
 | Multi-tenant organization support | 🚧 |
 | MFA / 2FA | 🚧 |
 
@@ -26,8 +26,9 @@ A lightweight, drop-in authentication service for your applications. Supports em
 ### 1. Install
 
 ```bash
-npm install @firstlayer/sdk
-
+npm install @your-org/auth-service
+# or
+pnpm add @your-org/auth-service
 ```
 
 ### 2. Initialize

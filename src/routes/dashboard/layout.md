@@ -9,7 +9,6 @@
     let { children } = $props();
 
     let loading = $state(true);
-    let userData = $state({ name: "User", email: "" });
 
     onMount(async () => {
         try {
@@ -25,31 +24,23 @@
                 return;
             }
 
-            // Extract real user details from your session
-            userData = {
-                name: session.user?.user_metadata?.full_name || session.user?.email?.split('@')[0] || "User",
-                email: session.user?.email || ""
-            };
-
             loading = false;
         } catch (err) {
             console.error("getSession failed:", err);
-            goto("/login");
         }
     });
 </script>
 
 {#if loading}
-    <div class="flex min-h-screen items-center justify-center bg-[#0a0a0b]">
-        <h2 class="text-zinc-400 text-sm">Loading...</h2>
-    </div>
+<div class="flex min-h-screen items-center justify-center bg-[#0a0a0b]">
+<h2 class="text-zinc-400 text-sm">Loading...</h2>
+</div>
 {:else}
-    <Sidebar.Provider>
-        <!-- Passing the authenticated user details down to the sidebar -->
-        <AppSidebar userName={userData.name} userEmail={userData.email} />
+<Sidebar.Provider>
+<AppSidebar />
 
-        <main class="flex-1 min-w-0 bg-[#0a0a0b] min-h-screen text-zinc-100">
-            <!-- Sticky mobile header -->
+        <main class="flex-1 min-w-0">
+            <!-- Sticky mobile-friendly header: always reachable trigger -->
             <header class="sticky top-0 z-10 flex items-center gap-3 border-b border-zinc-800 bg-[#0a0a0b]/80 backdrop-blur-md px-4 py-3 sm:px-6">
                 <Sidebar.Trigger class="h-9 w-9 rounded-md hover:bg-zinc-800 transition-colors" />
                 <span class="text-sm font-medium text-zinc-300 sm:hidden">Dashboard</span>
@@ -60,4 +51,5 @@
             </div>
         </main>
     </Sidebar.Provider>
+
 {/if}

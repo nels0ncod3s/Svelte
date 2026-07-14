@@ -3,8 +3,14 @@
 	import { Button } from "$lib/components/ui/button/index.js";
 	import { Input } from "$lib/components/ui/input/index.js";
 	import { Label } from "$lib/components/ui/label/index.js";
+
 	import FolderPlus from "@lucide/svelte/icons/folder-plus";
 	import Plus from "@lucide/svelte/icons/plus";
+
+	import Icon from "@lucide/svelte/icons/box";
+	import Package from "@lucide/svelte/icons/package";
+	import OpenPack from "@lucide/svelte/icons/package-open";
+	import PackagePlus from "@lucide/svelte/icons/package-plus";
 
 	// Placeholder trail — wire this up to real routing/project data later
 	const crumbs = ["Projects", "...", "Johnsnow", "Active"];
@@ -44,7 +50,7 @@
 		<Dialog.Root bind:open={dialogOpen}>
 			<Dialog.Trigger>
 				{#snippet child({ props })}
-					<Button {...props} class="gap-1.5">
+					<Button {...props} class="bg-violet-600 hover:bg-violet-400  text-white hover:text-white gap-1.5" variant="ghost">
 						<Plus class="h-4 w-4" />
 						Add Project
 					</Button>
@@ -85,13 +91,13 @@
 	{#if projects.length === 0}
 		<div class="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/30 px-6 py-16 sm:py-20 flex flex-col items-center text-center">
 			<div class="h-12 w-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-4">
-				<FolderPlus class="h-6 w-6 text-violet-400" />
+				<PackagePlus class="h-6 w-6 text-violet-400" />
 			</div>
 			<h2 class="text-base sm:text-lg font-semibold text-zinc-100">No projects yet</h2>
 			<p class="text-sm text-zinc-500 mt-1.5 max-w-xs">
 				Create your first project to start issuing API keys and managing users.
 			</p>
-			<Button class="mt-6 gap-1.5" onclick={() => (dialogOpen = true)}>
+			<Button class="mt-6 gap-1.5 border border-zinc-800 bg-zinc-800 hover:bg-zinc-800 text-zinc-300 hover:text-zinc-100" variant="ghost" onclick={() => (dialogOpen = true)}>
 				<Plus class="h-4 w-4" />
 				Add Project
 			</Button>
