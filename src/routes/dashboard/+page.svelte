@@ -40,7 +40,6 @@
 	</nav>
 
 	<div class="flex items-center justify-between mb-6">
-		<h1 class="text-xl sm:text-2xl font-semibold text-zinc-100">Welcome back, NAME</h1>
 
 		<Dialog.Root bind:open={dialogOpen}>
 			<Dialog.Trigger>

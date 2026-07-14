@@ -3,15 +3,11 @@
     import { goto } from "$app/navigation";
 
     import HouseIcon from "@lucide/svelte/icons/house";
-    import SearchIcon from "@lucide/svelte/icons/search";
     import SettingsIcon from "@lucide/svelte/icons/settings";
     import Users from "@lucide/svelte/icons/users";
-    import KeyRound from "@lucide/svelte/icons/key-round";
     import AppWindow from "@lucide/svelte/icons/app-window";
     import ShieldCheck from "@lucide/svelte/icons/shield-check";
     import ScrollText from "@lucide/svelte/icons/scroll-text";
-    import Webhook from "@lucide/svelte/icons/webhook";
-    import CreditCard from "@lucide/svelte/icons/credit-card";
     import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
     import LogOut from "@lucide/svelte/icons/log-out";
     import UserCog from "@lucide/svelte/icons/user-cog";
@@ -21,7 +17,7 @@
     import * as Avatar from "$lib/components/ui/avatar/index.js";
 
     // Wire these from a real session later (e.g. pass as props from +layout.svelte)
-    let { userName = "Nelson", userEmail = "nelson@example.com" } = $props();
+    let { userName = "Jon Doe", userEmail = "jon.doe@example.com" } = $props();
 
     async function signOut() {
         await logout();
@@ -39,14 +35,11 @@
 
     // Menu items.
     const items = [
-        { id: "home", title: "Home", url: "#", icon: HouseIcon },
+        { id: "home", title: "Dashboard", url: "#", icon: HouseIcon },
         { id: "app", title: "App", url: "#", icon: AppWindow },
         { id: "users", title: "Users", url: "#", icon: Users },
         { id: "auth", title: "Authentication", url: "#", icon: ShieldCheck },
-        { id: "api-keys", title: "API Keys", url: "#", icon: KeyRound },
         { id: "logs", title: "Logs", url: "#", icon: ScrollText },
-        { id: "webhook", title: "Webhook", url: "#", icon: Webhook },
-        { id: "billing", title: "Billings", url: "#", icon: CreditCard },
         { id: "settings", title: "Settings", url: "#", icon: SettingsIcon },
     ];
 </script>
@@ -58,13 +51,12 @@
             <div class="h-7 w-7 rounded-md bg-violet-500/20 border border-violet-400/30 flex items-center justify-center shrink-0">
                 <div class="h-2 w-2 rounded-sm bg-violet-400"></div>
             </div>
-            <span class="font-semibold tracking-tight text-sidebar-foreground">Sigil</span>
+            <span class="font-semibold tracking-tight text-sidebar-foreground">First Layer</span>
         </div>
     </Sidebar.Header>
 
     <Sidebar.Content>
         <Sidebar.Group>
-            <Sidebar.GroupLabel>Application</Sidebar.GroupLabel>
             <Sidebar.GroupContent>
                 <Sidebar.Menu>
                     {#each items as item (item.id)}
