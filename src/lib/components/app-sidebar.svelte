@@ -3,15 +3,12 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
 
-
     import Users from "@lucide/svelte/icons/users";    
     import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
     import LogOut from "@lucide/svelte/icons/log-out";
     import Logs from "@lucide/svelte/icons/files";
     import Settings from "@lucide/svelte/icons/settings";
-    import Dashboard from "@lucide/svelte/icons/layout-dashboard";
     import Folder from "@lucide/svelte/icons/folder";
-    import Folders from "@lucide/svelte/icons/folders";
     import AppWindow from "@lucide/svelte/icons/layers";
     import Auth from "@lucide/svelte/icons/shield";
     import UserCog from "@lucide/svelte/icons/user-cog";
@@ -20,12 +17,9 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import * as Avatar from "$lib/components/ui/avatar/index.js";
 
+    // avatarUrl is optional — falls back to initials if not provided
+    let { userName = "User", userEmail = "", avatarUrl = "" } = $props();
 
-    // Destructure properties passed down from layout.svelte
-    let { userName = "User", userEmail = "" } = $props();
-
-    // Gives us isMobile / setOpenMobile so we can close the sidebar after a
-    // nav click on mobile, and lets us force the dark palette below.
     const sidebar = Sidebar.useSidebar();
 
     async function signOut() {
@@ -44,11 +38,9 @@
     }
 
     function handleNavigate() {
-        // Mobile: collapse the sidebar as soon as a link is tapped.
         if (sidebar.isMobile) sidebar.setOpenMobile(false);
     }
 
-    // Configured real routes mapping to your folders
     const items = [
         { id: "projects", title: "Projects", url: "/dashboard", icon: Folder },
         { id: "app", title: "App", url: "/dashboard/App/", icon: AppWindow },
@@ -60,15 +52,16 @@
 </script>
 
 <Sidebar.Root class="bg-zinc-950 text-zinc-100 border-zinc-800">
-<!-- Brand / logo -->
-<Sidebar.Header class="border-b border-zinc-800 bg-zinc-950">
-<div class="flex items-center gap-2 px-2 py-1.5">
-<div class="h-7 w-7 rounded-md bg-violet-500/20 border border-violet-400/30 flex items-center justify-center shrink-0">
-<div class="h-2 w-2 rounded-sm bg-violet-400"></div>
-</div>
-<span class="font-semibold tracking-tight text-zinc-100">First Layer</span>
-</div>
-</Sidebar.Header>
+
+    <!-- Brand / logo -->
+    <Sidebar.Header class="border-b border-zinc-800 bg-zinc-950">
+        <div class="flex items-center gap-2 px-2 py-1.5">
+            <div class="h-7 w-7 rounded-md bg-violet-500/20 border border-violet-400/30 flex items-center justify-center shrink-0">
+                <div class="h-2 w-2 rounded-sm bg-violet-400"></div>
+            </div>
+            <span class="font-semibold tracking-tight text-zinc-100">First Layer</span>
+        </div>
+    </Sidebar.Header>
 
     <Sidebar.Content class="bg-zinc-950">
         <Sidebar.Group>
@@ -76,7 +69,6 @@
                 <Sidebar.Menu>
                     {#each items as item (item.id)}
                         <Sidebar.MenuItem>
-                            <!-- Use `isActive` dynamically matching SvelteKit's active URL store -->
                             <Sidebar.MenuButton
                                 isActive={$page.url.pathname === item.url}
                                 class="text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 data-[active=true]:bg-zinc-800 data-[active=true]:text-zinc-100"
@@ -106,6 +98,9 @@
                             class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-zinc-800 transition-colors"
                         >
                             <Avatar.Root class="h-7 w-7 shrink-0">
+                                {#if avatarUrl}
+                                    <Avatar.Image src={avatarUrl} alt={userName} class="object-cover" />
+                                {/if}
                                 <Avatar.Fallback class="text-xs bg-violet-500/20 text-violet-300">
                                     {initials(userName)}
                                 </Avatar.Fallback>
@@ -124,16 +119,21 @@
                     align="start"
                 >
                     <DropdownMenu.Item
-                        href="/dashboard/settings"
-                        class="gap-2 focus:bg-zinc-800 focus:text-zinc-100"
+                        class="gap-2 focus:bg-zinc-800 focus:text-zinc-100 p-0"
                     >
-                        <UserCog class="h-4 w-4" />
-                        Account settings
+
+                        <a href="/dashboard/Account/" 
+                        class="flex w-full items-center gap-2 w-full px-2 py-1.5"
+                        onclick={() => {}}
+                        >
+                            <UserCog class="h-4 w-4" />
+                                Account settings
+                        </a>
                     </DropdownMenu.Item>
                     <DropdownMenu.Separator class="bg-zinc-800" />
                     <DropdownMenu.Item
                         onclick={signOut}
-                        class="gap-2 focus:bg-zinc-800 focus:text-zinc-100"
+                        class="gap-2 text-red-400 focus:bg-red-500/10 focus:text-red-400"
                     >
                         <LogOut class="h-4 w-4" />
                         Log out

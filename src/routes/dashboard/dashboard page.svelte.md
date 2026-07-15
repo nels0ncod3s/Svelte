@@ -1,5 +1,4 @@
 <script>
-	import { enhance } from "$app/forms";
 	import { dashboard } from "$lib/stores/dashboard.svelte.js";
 
 	import * as Dialog from "$lib/components/ui/dialog/index.js";
@@ -17,18 +16,10 @@
 	import PackagePlus from "@lucide/svelte/icons/package-plus";
 	import FolderKanban from "@lucide/svelte/icons/folder-kanban";
 
-	// The breadcrumb lives entirely in +layout.svelte. This page only owns
-	// the grid/workspace content and the Add/Delete modals — all UI state
-	// comes from the shared `dashboard` store so the layout's header can
-	// trigger them too. Project data itself comes from +page.server.js's
-	// `load`, and is written back through its `create`/`delete` actions.
-	let { data } = $props();
-
-	// Hydrate the store whenever the server load re-runs (first load, or
-	// after a form action triggers SvelteKit's default invalidateAll()).
-	$effect(() => {
-		dashboard.setProjects(data.projects);
-	});
+	// The breadcrumb now lives entirely in +layout.svelte (single consolidated
+	// bar next to the project switcher). This page only owns the grid /
+	// workspace content and the Add/Delete modals — all state comes from the
+	// shared `dashboard` store so the layout's header can trigger them too.
 
 	// --- Search ---------------------------------------------------------------
 	let searchQuery = $state("");
@@ -38,35 +29,17 @@
 			: dashboard.projects
 	);
 
+	function handleCreateSubmit(e) {
+		e.preventDefault();
+		dashboard.createProject();
+	}
+
 	function handleAddDialogOpenChange(open) {
 		if (open) {
 			dashboard.dialogOpen = true;
 		} else {
 			dashboard.closeAddDialog();
 		}
-	}
-
-	/** Submits the "Create project" form to the `create` action. */
-	function submitCreate() {
-		return async ({ result, update }) => {
-			if (result.type === "success" && result.data?.project) {
-				dashboard.addProject(result.data.project);
-			} else if (result.type === "failure" && result.data?.field === "name") {
-				dashboard.nameError = result.data.message;
-			}
-			// Don't reset form fields on failure so the user doesn't lose their input.
-			await update({ reset: result.type === "success" });
-		};
-	}
-
-	/** Submits the "Delete project" confirmation form to the `delete` action. */
-	function submitDelete() {
-		return async ({ result, update }) => {
-			if (result.type === "success" && result.data?.deletedId) {
-				dashboard.removeProject(result.data.deletedId);
-			}
-			await update();
-		};
 	}
 </script>
 
@@ -243,10 +216,6 @@
 						value={dashboard.activeProject.name}
 						class="bg-zinc-900 border-zinc-800 text-zinc-100 focus-visible:ring-violet-500"
 					/>
-					<!-- NOTE: renaming isn't wired to a server action yet — this
-					     field is read-only in effect until an `update` action is
-					     added to +page.server.js, following the same pattern as
-					     `create`/`delete` below. -->
 				</div>
 			</div>
 		{:else}
@@ -260,8 +229,7 @@
 
 <!-- Add Project modal — can be opened from the toolbar/empty-state buttons
      above OR from "Add New Project" in the layout's header dropdown, since
-     `dialogOpen` lives on the shared store. Persists via the `create`
-     Form Action in +page.server.js. -->
+     `dialogOpen` lives on the shared store. -->
 <Dialog.Root open={dashboard.dialogOpen} onOpenChange={handleAddDialogOpenChange}>
 	<Dialog.Content class="sm:max-w-md bg-zinc-950 border border-zinc-800 text-zinc-100">
 		<Dialog.Header>
@@ -271,12 +239,11 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		<form method="POST" action="?/create" use:enhance={submitCreate} class="grid gap-4 pt-2">
+		<form onsubmit={handleCreateSubmit} class="grid gap-4 pt-2">
 			<div class="grid gap-2">
 				<Label for="project-name" class="text-zinc-300">Project name</Label>
 				<Input
 					id="project-name"
-					name="name"
 					placeholder="e.g. Johnsnow"
 					bind:value={dashboard.newProjectName}
 					oninput={() => (dashboard.nameError = "")}
@@ -294,7 +261,6 @@
 				<Label for="project-framework" class="text-zinc-300">Framework</Label>
 				<select
 					id="project-framework"
-					name="framework"
 					bind:value={dashboard.newProjectFramework}
 					class="w-full rounded-md border border-zinc-800 bg-zinc-900 text-zinc-100 text-sm px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
 				>
@@ -324,8 +290,7 @@
 </Dialog.Root>
 
 <!-- Delete confirmation — requires typing the exact project name before
-     the Delete button becomes enabled. Persists via the `delete` Form
-     Action, which re-checks the confirmation text server-side too. -->
+     the Delete button becomes enabled. -->
 <Dialog.Root open={dashboard.deleteTarget !== null} onOpenChange={(open) => !open && dashboard.cancelDelete()}>
 	<Dialog.Content class="sm:max-w-sm bg-zinc-950 border border-zinc-800 text-zinc-100">
 		<Dialog.Header>
@@ -335,42 +300,37 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		<form method="POST" action="?/delete" use:enhance={submitDelete} class="contents">
-			<input type="hidden" name="id" value={dashboard.deleteTarget?.id ?? ""} />
-			<input type="hidden" name="projectName" value={dashboard.deleteTarget?.name ?? ""} />
+		<div class="grid gap-2 pt-2">
+			<Label for="delete-confirm" class="text-zinc-300">
+				To confirm, type <span class="font-mono text-zinc-100">"{dashboard.deleteTarget?.name}"</span> below
+			</Label>
+			<Input
+				id="delete-confirm"
+				bind:value={dashboard.deleteConfirmText}
+				autocomplete="off"
+				spellcheck="false"
+				placeholder={dashboard.deleteTarget?.name ?? ""}
+				class="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-red-500"
+			/>
+		</div>
 
-			<div class="grid gap-2 pt-2">
-				<Label for="delete-confirm" class="text-zinc-300">
-					To confirm, type <span class="font-mono text-zinc-100">"{dashboard.deleteTarget?.name}"</span> below
-				</Label>
-				<Input
-					id="delete-confirm"
-					name="confirmName"
-					bind:value={dashboard.deleteConfirmText}
-					autocomplete="off"
-					spellcheck="false"
-					placeholder={dashboard.deleteTarget?.name ?? ""}
-					class="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-red-500"
-				/>
-			</div>
-
-			<Dialog.Footer class="mt-2 bg-zinc-950">
-				<Button
-					type="button"
-					variant="outline"
-					class="border-zinc-800 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
-					onclick={() => dashboard.cancelDelete()}
-				>
-					Cancel
-				</Button>
-				<Button
-					type="submit"
-					disabled={!dashboard.canDelete}
-					class="bg-red-600 hover:bg-red-500 text-white disabled:opacity-40 disabled:pointer-events-none"
-				>
-					Delete
-				</Button>
-			</Dialog.Footer>
-		</form>
+		<Dialog.Footer class="mt-2 bg-zinc-950">
+			<Button
+				type="button"
+				variant="outline"
+				class="border-zinc-800 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+				onclick={() => dashboard.cancelDelete()}
+			>
+				Cancel
+			</Button>
+			<Button
+				type="button"
+				disabled={!dashboard.canDelete}
+				class="bg-red-600 hover:bg-red-500 text-white disabled:opacity-40 disabled:pointer-events-none"
+				onclick={() => dashboard.confirmDelete()}
+			>
+				Delete
+			</Button>
+		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

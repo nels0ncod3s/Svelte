@@ -24,6 +24,9 @@
     // Destructure properties passed down from layout.svelte
     let { userName = "User", userEmail = "" } = $props();
 
+    //accepting avatars
+    
+
     // Gives us isMobile / setOpenMobile so we can close the sidebar after a
     // nav click on mobile, and lets us force the dark palette below.
     const sidebar = Sidebar.useSidebar();
@@ -50,8 +53,7 @@
 
     // Configured real routes mapping to your folders
     const items = [
-        { id: "home", title: "Overview", url: "/dashboard", icon: Dashboard },
-        { id: "projects", title: "Projects", url: "/dashboard/Projects/", icon: Folder },
+        { id: "projects", title: "Projects", url: "/dashboard", icon: Folder },
         { id: "app", title: "App", url: "/dashboard/App/", icon: AppWindow },
         { id: "users", title: "Users", url: "/dashboard/Users/", icon: Users },
         { id: "auth", title: "Authentication", url: "/dashboard/Auth/", icon: Auth },

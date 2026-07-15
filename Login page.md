@@ -32,6 +32,14 @@
 <div class="relative flex min-h-screen w-full items-center justify-center bg-[#09090b] px-4 overflow-hidden">
 	<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.04),transparent_55%)]"></div>
 
+	<a
+		href="/"
+		class="absolute left-6 top-6 flex items-center gap-2 text-sm font-semibold text-zinc-400 transition-colors hover:text-zinc-100"
+	>
+		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+		Back to home
+	</a>
+
 	<div class="relative w-full max-w-md flex flex-col items-center">
 
 		<!-- Icon badge -->

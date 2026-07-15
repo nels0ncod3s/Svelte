@@ -24,7 +24,7 @@
 			return;
 		}
 
-		goto("/dashboard");
+		window.location.href = "/dashboard";
 	}
 </script>
 

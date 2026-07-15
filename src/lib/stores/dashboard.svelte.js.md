@@ -1,15 +1,13 @@
 // lib/stores/dashboard.svelte.js
 //
-// Single source of truth for the projects dashboard UI. Both +layout.svelte
+// Single source of truth for the projects dashboard. Both +layout.svelte
 // (header project switcher + consolidated breadcrumb) and the dashboard
 // +page.svelte (grid/workspace + Add/Delete modals) import this same
 // singleton, so an action taken in one place (e.g. "Add New Project" in
 // the header dropdown) is reflected everywhere else instantly.
 //
-// Persistence lives in +page.server.js's `create`/`delete` Form Actions.
-// This store does NOT talk to Supabase directly — +page.svelte calls
-// `setProjects()` / `addProject()` / `removeProject()` after a server
-// action succeeds (see the `use:enhance` callbacks there).
+// NOTE: swap the in-memory `projects` array for real data fetching
+// (e.g. load on mount from your API/Supabase and reassign `dashboard.projects`).
 
 class DashboardStore {
 	projects = $state([]);
@@ -50,16 +48,9 @@ class DashboardStore {
 		return this.deleteTarget !== null && this.deleteConfirmText === this.deleteTarget.name;
 	}
 
-	/** Cheap client-side hint only — the DB's unique index is the real check. */
 	isNameTaken(name) {
 		const normalized = name.trim().toLowerCase();
 		return this.projects.some((p) => p.name.toLowerCase() === normalized);
-	}
-
-	// --- Sync from server ------------------------------------------------------
-	/** Called from +page.svelte with the `data.projects` load result. */
-	setProjects(projects) {
-		this.projects = projects ?? [];
 	}
 
 	// --- Add Project ---------------------------------------------------------
@@ -75,8 +66,21 @@ class DashboardStore {
 		this.newProjectFramework = "";
 	}
 
-	/** Called after the `create` Form Action returns the saved project. */
-	addProject(project) {
+	/** Returns true on success, false if validation failed (name empty/taken). */
+	createProject() {
+		const name = this.newProjectName.trim();
+		if (!name) return false;
+
+		if (this.isNameTaken(name)) {
+			this.nameError = `A project named "${name}" already exists.`;
+			return false;
+		}
+
+		const project = {
+			id: crypto.randomUUID(),
+			name,
+			framework: this.newProjectFramework || null
+		};
 		this.projects = [...this.projects, project];
 		this.closeAddDialog();
 
@@ -84,6 +88,7 @@ class DashboardStore {
 		this.activeProjectId = project.id;
 		this.settingsOpen = false;
 		this.view = "workspace";
+		return true;
 	}
 
 	// --- Navigation ------------------------------------------------------------
@@ -131,8 +136,9 @@ class DashboardStore {
 		this.deleteConfirmText = "";
 	}
 
-	/** Called after the `delete` Form Action confirms the row was removed. */
-	removeProject(id) {
+	confirmDelete() {
+		if (!this.canDelete) return;
+		const id = this.deleteTarget.id;
 		this.projects = this.projects.filter((p) => p.id !== id);
 		if (this.activeProjectId === id) this.goToGrid();
 		this.deleteTarget = null;
