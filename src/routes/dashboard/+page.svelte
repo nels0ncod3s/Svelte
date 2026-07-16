@@ -16,6 +16,14 @@
 	import ArrowLeft from "@lucide/svelte/icons/arrow-left";
 	import PackagePlus from "@lucide/svelte/icons/package-plus";
 	import FolderKanban from "@lucide/svelte/icons/folder-kanban";
+	import Users from "@lucide/svelte/icons/users";
+	import Monitor from "@lucide/svelte/icons/monitor";
+	import ShieldCheck from "@lucide/svelte/icons/shield-check";
+	import UserPlus from "@lucide/svelte/icons/user-plus";
+	import Minus from "@lucide/svelte/icons/minus";
+	import KeyRound from "@lucide/svelte/icons/key-round";
+	import Github from "$lib/Icons/github-mark.svelte";
+	import Google from "$lib/Icons/google.svelte";
 
 	// The breadcrumb lives entirely in +layout.svelte. This page only owns
 	// the grid/workspace content and the Add/Delete modals — all UI state
@@ -24,8 +32,19 @@
 	// `load`, and is written back through its `create`/`delete` actions.
 	let { data } = $props();
 
-	// Hydrate the store whenever the server load re-runs (first load, or
-	// after a form action triggers SvelteKit's default invalidateAll()).
+	// Effects don't run during SSR, so relying on $effect alone means the
+	// server renders the store's initial empty array — real projects only
+	// appear after the client hydrates and the effect fires. That's the
+	// "empty state flashes before my projects show up" bug. This direct
+	// call runs during the normal top-to-bottom script evaluation (both on
+	// the server and on the client's first pass), so the very first render
+	// already has the real data.
+	dashboard.setProjects(data.projects);
+
+	// Effect still needed for subsequent updates — e.g. after a form action
+	// triggers SvelteKit's default invalidateAll() and `data` changes on an
+	// already-mounted component, where a plain top-level statement wouldn't
+	// re-run.
 	$effect(() => {
 		dashboard.setProjects(data.projects);
 	});
@@ -37,6 +56,22 @@
 			? dashboard.projects.filter((p) => p.name.toLowerCase().includes(searchQuery.trim().toLowerCase()))
 			: dashboard.projects
 	);
+
+	// --- Workspace overview (mock data, same as Logs/Users/Settings — no
+	// real metrics backend exists yet) ---
+	const workspaceStats = [
+		{ label: "Total Users", value: "0", delta: "0%", icon: Users },
+		{ label: "Active Sessions", value: "0", delta: "0%", icon: Monitor },
+		{ label: "Verification Rate", value: "0%", delta: "0%", icon: ShieldCheck },
+		{ label: "Signups Today", value: "0", delta: "0%", icon: UserPlus }
+	];
+
+	const quickActions = [
+		{ label: "Create API key", icon: KeyRound, disabled: false },
+		{ label: "Configure Google", icon: Google, disabled: false },
+		{ label: "Configure GitHub", icon: Github, disabled: false },
+		{ label: "Invite teammate", icon: UserPlus, disabled: true }
+	];
 
 	function handleAddDialogOpenChange(open) {
 		if (open) {
@@ -135,19 +170,19 @@
 			</div>
 		{:else}
 			<!-- "My Projects" card grid -->
-			<ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+			<ul class="grid gap-5 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
 				{#each filteredProjects as project (project.id)}
-					<li class="group relative rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 hover:border-zinc-700 transition-colors">
+					<li class="group relative rounded-2xl border border-zinc-800 bg-zinc-900/40 p-7 min-h-[168px] flex flex-col justify-between hover:border-zinc-700 hover:bg-zinc-900/60 transition-colors">
 						<button
-							class="flex items-start gap-3 w-full text-left pr-8"
+							class="flex items-start gap-4 w-full text-left pr-8"
 							onclick={() => dashboard.openProject(project)}
 						>
-							<div class="h-9 w-9 shrink-0 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-								<FolderKanban class="h-4 w-4 text-violet-400" />
+							<div class="h-14 w-14 shrink-0 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+								<FolderKanban class="h-7 w-7 text-violet-400" />
 							</div>
-							<div class="min-w-0">
-								<p class="font-medium text-zinc-100 truncate">{project.name}</p>
-								<p class="text-xs text-zinc-500 mt-0.5">Tap to open workspace</p>
+							<div class="min-w-0 pt-1">
+								<p class="font-semibold text-lg text-zinc-100 truncate">{project.name}</p>
+								<p class="text-sm text-zinc-500 mt-1">Tap to open workspace</p>
 							</div>
 						</button>
 
@@ -158,7 +193,7 @@
 										{...props}
 										variant="ghost"
 										size="icon"
-										class="absolute top-3 right-3 h-7 w-7 text-zinc-500 hover:text-zinc-100 hover:bg-zinc-800"
+										class="absolute top-5 right-5 h-8 w-8 text-zinc-500 hover:text-zinc-100 hover:bg-zinc-800"
 										aria-label="Project options"
 									>
 										<EllipsisVertical class="h-4 w-4" />
@@ -250,9 +285,49 @@
 				</div>
 			</div>
 		{:else}
-			<div class="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
-				<h2 class="text-base font-semibold text-zinc-100 mb-1">{dashboard.activeProject.name}</h2>
-				<p class="text-sm text-zinc-500">Project workspace goes here.</p>
+			<div class="space-y-6">
+				<div>
+					<h2 class="text-base font-semibold text-zinc-100">{dashboard.activeProject.name}</h2>
+					<p class="text-sm text-zinc-500 mt-1">What's happening across {dashboard.activeProject.name} today.</p>
+				</div>
+
+				<!-- Stat cards -->
+				<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+					{#each workspaceStats as stat (stat.label)}
+						<div class="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 sm:p-5">
+							<div class="flex items-start justify-between gap-2">
+								<span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-zinc-500 leading-tight">{stat.label}</span>
+								<div class="h-7 w-7 shrink-0 rounded-md bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+									<stat.icon class="h-3.5 w-3.5 text-violet-400" />
+								</div>
+							</div>
+							<div class="mt-3 flex items-end justify-between gap-2">
+								<span class="text-2xl sm:text-3xl font-bold text-zinc-100">{stat.value}</span>
+								<span class="flex items-center gap-0.5 text-xs font-medium text-zinc-500 whitespace-nowrap">
+									<Minus class="h-3 w-3 shrink-0" />
+									{stat.delta}
+								</span>
+							</div>
+						</div>
+					{/each}
+				</div>
+
+				<!-- Quick actions -->
+				<div>
+					<h3 class="text-sm font-semibold text-zinc-300 mb-3">Quick actions</h3>
+					<div class="grid sm:grid-cols-2 gap-2.5">
+						{#each quickActions as action (action.label)}
+							<button
+								type="button"
+								disabled={action.disabled}
+								class="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 py-3 text-left text-sm font-medium text-zinc-200 hover:border-zinc-700 hover:bg-zinc-900/70 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+							>
+								<action.icon class="h-4 w-4 text-zinc-400 shrink-0" />
+								{action.label}
+							</button>
+						{/each}
+					</div>
+				</div>
 			</div>
 		{/if}
 	{/if}
@@ -306,7 +381,7 @@
 				</select>
 			</div>
 
-			<Dialog.Footer class="mt-2 bg-zinc-950">
+			<Dialog.Footer class="mt-2 bg-zinc-950 border-zinc-800/60">
 				<Button
 					type="button"
 					variant="outline"
@@ -354,7 +429,7 @@
 				/>
 			</div>
 
-			<Dialog.Footer class="mt-2 bg-zinc-950">
+			<Dialog.Footer class="mt-2 bg-zinc-950 border-zinc-800/60">
 				<Button
 					type="button"
 					variant="outline"

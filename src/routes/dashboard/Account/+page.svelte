@@ -1,6 +1,7 @@
 <script>
   import { enhance } from '$app/forms';
-  
+  import { onDestroy } from 'svelte';
+
   // Lucide icon imports (matches the vibe of your sidebar)
   import User from "@lucide/svelte/icons/user";
   import Mail from "@lucide/svelte/icons/mail";
@@ -9,6 +10,20 @@
 
   let { data, form } = $props();
   let isSaving = $state(false);
+
+  // Live preview of a picked-but-not-yet-saved avatar. Falls back to the
+  // saved avatar_url until the user picks a new file.
+  let previewUrl = $state(null);
+
+  function handleFileChange(e) {
+    const file = e.currentTarget.files?.[0];
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = file ? URL.createObjectURL(file) : null;
+  }
+
+  onDestroy(() => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+  });
 </script>
 
 <div class="mx-auto max-w-2xl px-4 py-8 md:py-12 text-zinc-100">
@@ -40,9 +55,13 @@
     enctype="multipart/form-data"
     use:enhance={() => {
       isSaving = true;
-      return async ({ update }) => {
+      return async ({ result, update }) => {
         await update();
         isSaving = false;
+        if (result.type === 'success') {
+          if (previewUrl) URL.revokeObjectURL(previewUrl);
+          previewUrl = null;
+        }
       };
     }}
     class="space-y-8"
@@ -53,8 +72,8 @@
     <!-- Profile Picture Selection -->
     <div class="flex flex-col sm:flex-row sm:items-center gap-6 rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
       <div class="relative group h-20 w-20 rounded-full bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center overflow-hidden shrink-0 transition-all hover:border-violet-500">
-        {#if data.profile?.avatar_url}
-          <img src={data.profile.avatar_url} alt="Profile preview" class="h-full w-full object-cover" />
+        {#if previewUrl || data.profile?.avatar_url}
+          <img src={previewUrl || data.profile.avatar_url} alt="Profile preview" class="h-full w-full object-cover" />
         {:else}
           <User class="h-8 w-8 text-zinc-500" />
         {/if}
@@ -68,7 +87,7 @@
         <p class="text-xs text-zinc-400 mb-3">JPG, PNG or WEBP. Max size 2MB.</p>
         <label class="inline-flex cursor-pointer items-center justify-center rounded-lg bg-zinc-800 px-3.5 py-2 text-xs font-semibold text-zinc-200 border border-zinc-700 transition-colors hover:bg-zinc-750 hover:text-zinc-100">
           Upload New Image
-          <input type="file" name="avatarFile" accept="image/*" class="sr-only" />
+          <input type="file" name="avatarFile" accept="image/*" class="sr-only" onchange={handleFileChange} />
         </label>
       </div>
     </div>

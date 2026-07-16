@@ -1,6 +1,5 @@
 <script>
 	import { signup } from "$lib/services/auth";
-	import { goto } from "$app/navigation";
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 
@@ -11,6 +10,7 @@
 	let loading = $state(false);
 	let showPassword = $state(false);
 	let showConfirmPassword = $state(false);
+	let confirmationSent = $state(false);
 
 	async function createAccount(e) {
 		e.preventDefault();
@@ -23,12 +23,22 @@
 
 		loading = true;
 
-		const { error: signupError } = await signup(email, password);
+		const { data, error: signupError } = await signup(email, password);
 
 		loading = false;
 
 		if (signupError) {
 			error = signupError.message;
+			return;
+		}
+
+		// If email confirmation is on (the Supabase default), signUp()
+		// succeeds but returns no session — the user isn't actually logged
+		// in yet. Redirecting to /dashboard here would just bounce them
+		// straight back to /login, so show a "check your email" state
+		// instead of assuming success means signed-in.
+		if (!data?.session) {
+			confirmationSent = true;
 			return;
 		}
 
@@ -69,6 +79,17 @@
 			Get started with your Auth-as-a-Service developer account
 		</p>
 
+		{#if confirmationSent}
+			<!-- Signup succeeded but Supabase requires email confirmation
+			     before a session exists — don't pretend they're logged in. -->
+			<div class="w-full flex flex-col items-center text-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/50 px-6 py-8">
+				<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-lime-400"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+				<h2 class="text-lg font-semibold text-zinc-100">Check your email</h2>
+				<p class="text-sm text-zinc-400 max-w-xs">
+					We sent a confirmation link to <span class="text-zinc-200 font-medium">{email}</span>. Click it to activate your account, then log in.
+				</p>
+			</div>
+		{:else}
 		<form onsubmit={createAccount} class="w-full grid gap-3">
 			<div class="relative">
 				<span class="absolute inset-y-0 left-5 flex items-center text-zinc-500 pointer-events-none">
@@ -167,6 +188,7 @@
 				{/if}
 			</Button>
 		</form>
+		{/if}
 
 		<div class="flex items-center justify-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 mt-10">
 			<span>Already have an account?</span>

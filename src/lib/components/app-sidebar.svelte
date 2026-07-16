@@ -43,11 +43,11 @@
 
     const items = [
         { id: "projects", title: "Projects", url: "/dashboard", icon: Folder },
-        { id: "app", title: "App", url: "/dashboard/App/", icon: AppWindow },
-        { id: "users", title: "Users", url: "/dashboard/Users/", icon: Users },
-        { id: "auth", title: "Authentication", url: "/dashboard/Auth/", icon: Auth },
-        { id: "logs", title: "Logs", url: "/dashboard/Logs/", icon: Logs },
-        { id: "settings", title: "Settings", url: "/dashboard/Settings/", icon: Settings },
+        { id: "app", title: "App", url: "/dashboard/App", icon: AppWindow },
+        { id: "users", title: "Users", url: "/dashboard/Users", icon: Users },
+        { id: "auth", title: "Authentication", url: "/dashboard/Auth", icon: Auth },
+        { id: "logs", title: "Logs", url: "/dashboard/Logs", icon: Logs },
+        { id: "settings", title: "Settings", url: "/dashboard/Settings", icon: Settings },
     ];
 </script>
 
@@ -66,12 +66,12 @@
     <Sidebar.Content class="bg-zinc-950">
         <Sidebar.Group>
             <Sidebar.GroupContent>
-                <Sidebar.Menu>
+                <Sidebar.Menu class="gap-1.5">
                     {#each items as item (item.id)}
                         <Sidebar.MenuItem>
                             <Sidebar.MenuButton
                                 isActive={$page.url.pathname === item.url}
-                                class="text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 data-[active=true]:bg-zinc-800 data-[active=true]:text-zinc-100"
+                                class="h-11 text-base [&_svg]:size-5 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 data-[active=true]:bg-zinc-800 data-[active=true]:text-zinc-100"
                             >
                                 {#snippet child({ props })}
                                     <a href={item.url} {...props} onclick={handleNavigate}>
@@ -122,9 +122,9 @@
                         class="gap-2 focus:bg-zinc-800 focus:text-zinc-100 p-0"
                     >
 
-                        <a href="/dashboard/Account/" 
+                        <a href="/dashboard/Account" 
                         class="flex w-full items-center gap-2 w-full px-2 py-1.5"
-                        onclick={() => {}}
+                        onclick={handleNavigate}
                         >
                             <UserCog class="h-4 w-4" />
                                 Account settings

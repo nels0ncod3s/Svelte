@@ -20,7 +20,7 @@
 <svelte:window onclick={handleWindowClick} />
 
 <Sidebar.Provider>
-	<AppSidebar userName={data.user.name} userEmail={data.user.email} />
+	<AppSidebar userName={data.user.name} userEmail={data.user.email} avatarUrl={data.user.avatarUrl} />
 
 	<main class="flex-1 min-w-0 bg-[#0a0a0b] min-h-screen text-zinc-100">
 
