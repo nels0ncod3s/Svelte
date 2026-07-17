@@ -1,12 +1,29 @@
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
-// No load() here anymore — the project list comes from dashboard/+layout.server.js
-// now, since the header switcher (which lives in the layout) needs it on
-// every dashboard route, not just this grid page.
+export const load = async ({ locals }) => {
+	const { user } = await locals.safeGetSession();
+
+	if (!user) {
+		throw redirect(303, '/login');
+	}
+
+	const { data: projects, error } = await locals.supabase
+		.from('Projects')
+		.select('*')
+		.eq('user_id', user.id)
+		.order('created_at', { ascending: false });
+
+	if (error) {
+		console.error('Error loading projects:', error.message);
+		return { projects: [] };
+	}
+
+	return { projects };
+};
 
 export const actions = {
 	// Creates a project for the logged-in user. Called from the "Add Project"
-	// form via use:enhance in +layout.svelte.
+	// form via use:enhance in +page.svelte.
 	create: async ({ request, locals }) => {
 		const { user } = await locals.safeGetSession();
 		if (!user) return fail(401, { message: 'You must be logged in.' });

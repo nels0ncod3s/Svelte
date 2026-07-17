@@ -10,7 +10,7 @@ export const load = async ({ locals }) => {
 		throw redirect(303, '/login');
 	}
 
-	const { data: profile, error: profileError } = await locals.supabase
+	const { data: profile, error } = await locals.supabase
 		.from('profiles')
 		.select('display_name, avatar_url')
 		.eq('id', user.id)
@@ -18,22 +18,8 @@ export const load = async ({ locals }) => {
 
 	// PGRST116 = no profile row yet — normal for a user who hasn't visited
 	// Account settings, not a failure.
-	if (profileError && profileError.code !== 'PGRST116') {
-		console.error('Error loading profile for sidebar:', profileError.message);
-	}
-
-	// Full project list, loaded here (not on the grid page) because the
-	// header's project switcher renders on every /dashboard/** route and
-	// needs this list even when the grid page has never been visited this
-	// session (e.g. a hard refresh straight into /dashboard/xyz/App).
-	const { data: projects, error: projectsError } = await locals.supabase
-		.from('Projects')
-		.select('*')
-		.eq('user_id', user.id)
-		.order('created_at', { ascending: false });
-
-	if (projectsError) {
-		console.error('Error loading projects:', projectsError.message);
+	if (error && error.code !== 'PGRST116') {
+		console.error('Error loading profile for sidebar:', error.message);
 	}
 
 	return {
@@ -45,7 +31,6 @@ export const load = async ({ locals }) => {
 				'User',
 			email: user.email || '',
 			avatarUrl: profile?.avatar_url || ''
-		},
-		projects: projects ?? []
+		}
 	};
 };

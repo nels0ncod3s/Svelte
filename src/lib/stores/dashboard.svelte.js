@@ -1,23 +1,20 @@
 // lib/stores/dashboard.svelte.js
 //
-// Single source of truth for the projects dashboard UI. Both +layout.svelte
-// (header project switcher + consolidated breadcrumb) and the dashboard
-// +page.svelte (grid/workspace + Add/Delete modals) import this same
-// singleton, so an action taken in one place (e.g. "Add New Project" in
-// the header dropdown) is reflected everywhere else instantly.
+// Shared UI state for the dashboard: the header's project list + switcher
+// dropdown, and the Add/Delete Project modals (both rendered once in
+// dashboard/+layout.svelte so they're reachable from any dashboard route).
 //
-// Persistence lives in +page.server.js's `create`/`delete` Form Actions.
-// This store does NOT talk to Supabase directly — +page.svelte calls
-// `setProjects()` / `addProject()` / `removeProject()` after a server
-// action succeeds (see the `use:enhance` callbacks there).
+// "Which project is active" is NOT stored here — it lives in the URL
+// (/dashboard/[project]/...), so it survives refreshes and deep links.
+// Read it via `$page.params.project` / `$page.data.project` in components.
+//
+// Persistence lives in dashboard/+page.server.js's `create`/`delete` Form
+// Actions. This store does NOT talk to Supabase directly.
+
+import { goto } from "$app/navigation";
 
 class DashboardStore {
 	projects = $state([]);
-
-	/** 'grid' = "My Projects" home. 'workspace' = inside a single project. */
-	view = $state("grid");
-	activeProjectId = $state(null);
-	settingsOpen = $state(false);
 
 	// --- Header project switcher dropdown ---------------------------------
 	switcherOpen = $state(false);
@@ -32,20 +29,6 @@ class DashboardStore {
 	deleteTarget = $state(null);
 	deleteConfirmText = $state("");
 
-	get activeProject() {
-		return this.projects.find((p) => p.id === this.activeProjectId) ?? null;
-	}
-
-	/** Single consolidated breadcrumb trail, rendered only in the layout header. */
-	get crumbs() {
-		if (this.view === "workspace" && this.activeProject) {
-			return this.settingsOpen
-				? [this.activeProject.name, "Settings"]
-				: [this.activeProject.name];
-		}
-		return [];
-	}
-
 	get canDelete() {
 		return this.deleteTarget !== null && this.deleteConfirmText === this.deleteTarget.name;
 	}
@@ -57,7 +40,7 @@ class DashboardStore {
 	}
 
 	// --- Sync from server ------------------------------------------------------
-	/** Called from +page.svelte with the `data.projects` load result. */
+	/** Called from +page.svelte (and now +layout.svelte's parent data) with the load result. */
 	setProjects(projects) {
 		this.projects = projects ?? [];
 	}
@@ -81,30 +64,18 @@ class DashboardStore {
 		this.closeAddDialog();
 
 		// Post-creation redirect: land directly on the new project's workspace.
-		this.activeProjectId = project.id;
-		this.settingsOpen = false;
-		this.view = "workspace";
+		goto(`/dashboard/${project.id}`);
 	}
 
 	// --- Navigation ------------------------------------------------------------
-	goToGrid() {
-		this.view = "grid";
-		this.activeProjectId = null;
-		this.settingsOpen = false;
-	}
-
 	openProject(project) {
-		this.activeProjectId = project.id;
-		this.settingsOpen = false;
-		this.view = "workspace";
 		this.switcherOpen = false;
+		goto(`/dashboard/${project.id}`);
 	}
 
 	openProjectSettings(project) {
-		this.activeProjectId = project.id;
-		this.settingsOpen = true;
-		this.view = "workspace";
 		this.switcherOpen = false;
+		goto(`/dashboard/${project.id}/Settings`);
 	}
 
 	/** Used by the header project switcher — same effect as openProject. */
@@ -124,6 +95,7 @@ class DashboardStore {
 	requestDelete(project) {
 		this.deleteTarget = project;
 		this.deleteConfirmText = "";
+		this.switcherOpen = false;
 	}
 
 	cancelDelete() {
@@ -134,7 +106,6 @@ class DashboardStore {
 	/** Called after the `delete` Form Action confirms the row was removed. */
 	removeProject(id) {
 		this.projects = this.projects.filter((p) => p.id !== id);
-		if (this.activeProjectId === id) this.goToGrid();
 		this.deleteTarget = null;
 		this.deleteConfirmText = "";
 	}

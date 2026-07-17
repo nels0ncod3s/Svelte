@@ -2,6 +2,7 @@
     import { logout } from "$lib/services/auth";
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
+    import { dashboard } from "$lib/stores/dashboard.svelte.js";
 
     import Users from "@lucide/svelte/icons/users";    
     import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
@@ -21,6 +22,11 @@
     let { userName = "User", userEmail = "", avatarUrl = "" } = $props();
 
     const sidebar = Sidebar.useSidebar();
+
+    // The URL owns "which project is active" — this is what makes the
+    // sidebar automatically reflect whichever project's pages you're
+    // currently on, and survive a page refresh.
+    let activeProjectId = $derived($page.params.project ?? null);
 
     async function signOut() {
         await logout();
@@ -42,12 +48,11 @@
     }
 
     const items = [
-        { id: "projects", title: "Projects", url: "/dashboard", icon: Folder },
-        { id: "app", title: "App", url: "/dashboard/App", icon: AppWindow },
-        { id: "users", title: "Users", url: "/dashboard/Users", icon: Users },
-        { id: "auth", title: "Authentication", url: "/dashboard/Auth", icon: Auth },
-        { id: "logs", title: "Logs", url: "/dashboard/Logs", icon: Logs },
-        { id: "settings", title: "Settings", url: "/dashboard/Settings", icon: Settings },
+        { id: "app", title: "App", segment: "App", icon: AppWindow },
+        { id: "users", title: "Users", segment: "Users", icon: Users },
+        { id: "auth", title: "Authentication", segment: "Auth", icon: Auth },
+        { id: "logs", title: "Logs", segment: "Logs", icon: Logs },
+        { id: "settings", title: "Settings", segment: "Settings", icon: Settings },
     ];
 </script>
 
@@ -67,21 +72,51 @@
         <Sidebar.Group>
             <Sidebar.GroupContent>
                 <Sidebar.Menu class="gap-1.5">
+
+                    <!-- Projects — never project-scoped, always enabled -->
+                    <Sidebar.MenuItem>
+                        <Sidebar.MenuButton
+                            isActive={$page.url.pathname === "/dashboard"}
+                            class="h-11 text-base [&_svg]:size-5 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 data-[active=true]:bg-zinc-800 data-[active=true]:text-zinc-100"
+                        >
+                            {#snippet child({ props })}
+                                <a href="/dashboard" {...props} onclick={handleNavigate}>
+                                    <Folder />
+                                    <span>Projects</span>
+                                </a>
+                            {/snippet}
+                        </Sidebar.MenuButton>
+                    </Sidebar.MenuItem>
+
                     {#each items as item (item.id)}
                         <Sidebar.MenuItem>
-                            <Sidebar.MenuButton
-                                isActive={$page.url.pathname === item.url}
-                                class="h-11 text-base [&_svg]:size-5 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 data-[active=true]:bg-zinc-800 data-[active=true]:text-zinc-100"
-                            >
-                                {#snippet child({ props })}
-                                    <a href={item.url} {...props} onclick={handleNavigate}>
-                                        <item.icon />
-                                        <span>{item.title}</span>
-                                    </a>
-                                {/snippet}
-                            </Sidebar.MenuButton>
+                            {#if activeProjectId}
+                                {@const url = `/dashboard/${activeProjectId}/${item.segment}`}
+                                <Sidebar.MenuButton
+                                    isActive={$page.url.pathname === url}
+                                    class="h-11 text-base [&_svg]:size-5 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 data-[active=true]:bg-zinc-800 data-[active=true]:text-zinc-100"
+                                >
+                                    {#snippet child({ props })}
+                                        <a href={url} {...props} onclick={handleNavigate}>
+                                            <item.icon />
+                                            <span>{item.title}</span>
+                                        </a>
+                                    {/snippet}
+                                </Sidebar.MenuButton>
+                            {:else}
+                                <!-- No active project yet: greyed out, prompts project
+                                     creation instead of navigating anywhere. -->
+                                <Sidebar.MenuButton
+                                    class="h-11 text-base [&_svg]:size-5 text-zinc-600 cursor-not-allowed hover:bg-transparent hover:text-zinc-600"
+                                    onclick={() => dashboard.openAddDialog()}
+                                >
+                                    <item.icon />
+                                    <span>{item.title}</span>
+                                </Sidebar.MenuButton>
+                            {/if}
                         </Sidebar.MenuItem>
                     {/each}
+
                 </Sidebar.Menu>
             </Sidebar.GroupContent>
         </Sidebar.Group>
