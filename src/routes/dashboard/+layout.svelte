@@ -1,6 +1,6 @@
 <script>
 	import { page } from "$app/stores";
-	import { goto } from "$app/navigation";
+	import { goto, preloadData } from "$app/navigation";
 	import { enhance } from "$app/forms";
 	import { dashboard } from "$lib/stores/dashboard.svelte.js";
 
@@ -120,6 +120,8 @@
 												role="option"
 												aria-selected={$page.params.project === project.id}
 												onclick={() => dashboard.switchProject(project)}
+												onmouseenter={() => preloadData(`/dashboard/${project.id}`)}
+												onfocus={() => preloadData(`/dashboard/${project.id}`)}
 												class="w-full flex items-center justify-between px-3 py-2 text-sm text-left text-zinc-200 hover:bg-zinc-800 transition-colors {$page.params.project === project.id ? 'text-white font-medium' : ''}"
 											>
 												{project.name}
@@ -161,8 +163,8 @@
 					{#if i === crumbs.length - 1}
 						<span class="text-zinc-100 font-medium truncate">{crumb}</span>
 					{:else}
-						<a
-							href={`/dashboard/${activeProject.id}`}
+						
+						<a	href={`/dashboard/${activeProject.id}`}
 							class="text-zinc-500 hover:text-zinc-300 transition-colors truncate"
 						>
 							{crumb}

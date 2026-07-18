@@ -108,7 +108,10 @@
                                      creation instead of navigating anywhere. -->
                                 <Sidebar.MenuButton
                                     class="h-11 text-base [&_svg]:size-5 text-zinc-600 cursor-not-allowed hover:bg-transparent hover:text-zinc-600"
-                                    onclick={() => dashboard.openAddDialog()}
+                                    onclick={() => {
+                                        handleNavigate();
+                                        dashboard.openAddDialog();
+                                    }}
                                 >
                                     <item.icon />
                                     <span>{item.title}</span>
