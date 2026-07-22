@@ -32,8 +32,8 @@
 
 	const quickActions = [
 		{ label: "Create API key", icon: KeyRound, disabled: false },
-		{ label: "Configure Google", icon: Google, disabled: false },
-		{ label: "Configure GitHub", icon: Github, disabled: false },
+		{ label: "Configure Google", icon: Google, disabled: true },
+		{ label: "Configure GitHub", icon: Github, disabled: true },
 		{ label: "Invite teammate", icon: UserPlus, disabled: true }
 	];
 </script>

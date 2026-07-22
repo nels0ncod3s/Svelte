@@ -13,6 +13,7 @@
     import AppWindow from "@lucide/svelte/icons/layers";
     import Auth from "@lucide/svelte/icons/shield";
     import UserCog from "@lucide/svelte/icons/user-cog";
+    import APIKey from "@lucide/svelte/icons/key";
 
     import * as Sidebar from "$lib/components/ui/sidebar/index.js";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
@@ -51,6 +52,7 @@
         { id: "app", title: "App", segment: "App", icon: AppWindow },
         { id: "users", title: "Users", segment: "Users", icon: Users },
         { id: "auth", title: "Authentication", segment: "Auth", icon: Auth },
+        { id: "api", title: "API Keys", segment: "API Keys", icon: APIKey }
         { id: "logs", title: "Logs", segment: "Logs", icon: Logs },
         { id: "settings", title: "Settings", segment: "Settings", icon: Settings },
     ];
