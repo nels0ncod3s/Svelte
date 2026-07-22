@@ -52,7 +52,7 @@
         { id: "app", title: "App", segment: "App", icon: AppWindow },
         { id: "users", title: "Users", segment: "Users", icon: Users },
         { id: "auth", title: "Authentication", segment: "Auth", icon: Auth },
-        { id: "api", title: "API Keys", segment: "API Keys", icon: APIKey }
+        { id: "api", title: "API Keys", segment: "API Keys", icon: APIKey },
         { id: "logs", title: "Logs", segment: "Logs", icon: Logs },
         { id: "settings", title: "Settings", segment: "Settings", icon: Settings },
     ];
